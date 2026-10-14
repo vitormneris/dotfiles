@@ -15,6 +15,7 @@ def autostart():
     ])
     subprocess.Popen(["picom", "--backend", "glx"])
     subprocess.Popen(["dunst"])
+    subprocess.Popen(["jesusphrases"])
 
 # Função para pegar o volume atual do microfone
 def get_mic_volume():
