@@ -1,18 +1,15 @@
 from collections.abc import Callable
 
+import os
 import subprocess
 from libqtile import bar, layout, qtile, widget, hook
 from libqtile.config import Click, Drag, Group, Key, Match, Output, Screen
 from libqtile.lazy import lazy
-# from libqtile.utils import guess_terminal
 
 @hook.subscribe.startup_once
 def autostart():
-    subprocess.run([
-        "xrandr", 
-        "--output", "HDMI-1", "--mode", "1920x1080", "--pos", "0x0", "--primary",
-        "--output", "eDP-1", "--mode", "1920x1080", "--pos", "1920x0"
-    ])
+    home = os.path.expanduser('~')
+    subprocess.run([home + '/dotfiles/scripts/monitor_xrandr_config.sh'])
     subprocess.Popen(["picom", "--backend", "glx"])
     subprocess.Popen(["dunst"])
     subprocess.Popen(["jesusphrases"])
