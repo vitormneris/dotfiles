@@ -246,12 +246,21 @@ screens = [
                 widget.CPU(),
                 widget.Sep(padding=10),
                 widget.GenPollCommand(
-                    cmd='if [[ $(nmcli n connectivity) = full ]]; then echo "CONN"; else echo "DISC"; fi',
+                    cmd="bluetoothctl show | awk '/PowerState/ { print toupper($2) }'",
+                    fmt="BT: {}",
+                    update_interval=2, 
+                    shell=True,
+                    mouse_callbacks={
+                        "Button1": lazy.spawn("alacritty -e bluetoothctl"),
+                    },
+                ),
+                widget.GenPollCommand(
+                    cmd="if [[ $(nmcli n connectivity) = full ]]; then echo CONN - $(nmcli device show | awk 'NR <= 6 && /GENERAL.CONNECTION:/ { print $2 }'); else echo DISC; fi",
                     fmt="Wi-Fi: {}",
                     update_interval=2, 
                     shell=True,
                     mouse_callbacks={
-                        "Button1": lazy.spawn("bash -c 'if [[ $(nmcli n connectivity) = full ]]; then nmcli n off; else nmcli n on; fi'"),   # Rolagem para cima (aumenta)
+                        "Button1": lazy.spawn("alacritty -e nmtui"),
                     },
                 ),
                 widget.Sep(padding=10),
@@ -283,7 +292,12 @@ screens = [
                     },
                 ),
                 widget.Sep(padding=10),
-                widget.Clock(format="%d/%m/%Y %a %H:%M:%S"),
+                widget.Clock(
+                    format="%d/%m/%Y %a %H:%M:%S",
+                    mouse_callbacks={
+                        "Button1": lazy.spawn("korganizer"),   # Rolagem para cima (aumenta)
+                    }
+                ),
                 widget.Sep(padding=10),
                 widget.QuickExit(countdown_start=10, default_text="vitor")
             ],
