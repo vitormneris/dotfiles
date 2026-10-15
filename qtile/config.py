@@ -49,7 +49,7 @@ def decrease_mic():
 mic_widget = widget.GenPollText(
     func=get_mic_volume,
     update_interval=1,
-    fmt='MIC: {}',
+    fmt='🎤: {}',
     mouse_callbacks={
         'Button1': toggle_mic,       # Clique esquerdo → mutar
         'Button4': increase_mic,     # Scroll up → aumentar volume
@@ -236,7 +236,7 @@ screens = [
                 # widget.StatusNotifier(),
                 widget.Systray(),
                 widget.GenPollCommand(
-                    cmd='curl -s wttr.in/Sao_Paulo?format=%C+%t',
+                    cmd='curl -s wttr.in/Sao_Paulo?format=%C+%c+%t',
                     shell=True,
                     update_interval=60,
                     fmt="{}"
@@ -256,7 +256,7 @@ screens = [
                 ),
                 widget.GenPollCommand(
                     cmd="if [[ $(nmcli n connectivity) = full ]]; then echo CONN - $(nmcli device show | awk 'NR <= 6 && /GENERAL.CONNECTION:/ { print $2 }'); else echo DISC; fi",
-                    fmt="Wi-Fi: {}",
+                    fmt="🌐: {}",
                     update_interval=2, 
                     shell=True,
                     mouse_callbacks={
@@ -264,16 +264,16 @@ screens = [
                     },
                 ),
                 widget.Sep(padding=10),
-                widget.TextBox("VOL:"),
+                widget.TextBox("🔉:"),
                 # Need to alsa-utils
                 widget.PulseVolume(mouse_callbacks={ "Button1": lazy.spawn("pavucontrol") }),
                 mic_widget,
                 widget.Sep(padding=10),
-                widget.TextBox("BAT:"),
+                widget.TextBox("🔋"),
                 widget.Battery(format="{char} {percent:2.0%}", update_interval=5),
                 widget.Sep(padding=10),
                 widget.Backlight(
-                    format="BN1: {percent:2.0%}",
+                    format="🔆1: {percent:2.0%}",
                     backlight_name="intel_backlight",
                     step=5,
                     mouse_callbacks={
@@ -283,7 +283,7 @@ screens = [
                 ),
                 widget.GenPollCommand(
                     cmd='ddcutil getvcp 10 | grep -oE "current value =\s*[0-9]+" | awk "{print \$4}"',
-                    fmt="BN2: {}%",
+                    fmt="🔆2: {}%",
                     update_interval=2, 
                     shell=True,
                     mouse_callbacks={
