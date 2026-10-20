@@ -14,7 +14,6 @@ def autostart():
     subprocess.Popen(["dunst"])
     subprocess.Popen(["jesusphrases"])
 
-# Função para pegar o volume atual do microfone
 def get_mic_volume():
     try:
         output = subprocess.run(
@@ -33,30 +32,6 @@ def get_mic_volume():
     except:
         return "N/A"
 
-# Função para mutar/desmutar o microfone
-def toggle_mic():
-    subprocess.run(["pactl", "set-source-mute", "@DEFAULT_SOURCE@", "toggle"])
-
-# Função para aumentar o volume
-def increase_mic():
-    subprocess.run(["pactl", "set-source-volume", "@DEFAULT_SOURCE@", "+5%"])
-
-# Função para diminuir o volume
-def decrease_mic():
-    subprocess.run(["pactl", "set-source-volume", "@DEFAULT_SOURCE@", "-5%"])
-
-# Widget customizado
-mic_widget = widget.GenPollText(
-    func=get_mic_volume,
-    update_interval=1,
-    fmt='🎤: {}',
-    mouse_callbacks={
-        'Button1': toggle_mic,       # Clique esquerdo → mutar
-        'Button4': increase_mic,     # Scroll up → aumentar volume
-        'Button5': decrease_mic      # Scroll down → diminuir volume
-    }
-)
-
 # Mover janela para a workspace anterior e ir junto
 def window_to_previous_group(qtile):
     if qtile.current_window is not None:
@@ -73,6 +48,8 @@ def window_to_next_group(qtile):
 
 mod = "mod4"
 terminal = "alacritty"
+file_explore = "dolphin"
+text_editor = "codium"
 
 keys = [
     # A list of available commands that can be bound to keys can be found
@@ -120,6 +97,8 @@ keys = [
         desc="Toggle between split and unsplit sides of stack",
     ),
     Key([mod], "t", lazy.spawn(terminal), desc="Launch terminal"),
+    Key([mod], "e", lazy.spawn(file_explore), desc="Launch File explore"),
+    Key([mod], "v", lazy.spawn(text_editor), desc="Launch text editor"),
     # Toggle between different layouts as defined below
     Key([mod], "Tab", lazy.next_layout(), desc="Toggle between layouts"),
     Key([mod], "q", lazy.window.kill(), desc="Kill focused window"),
@@ -211,10 +190,30 @@ layouts = [
 
 widget_defaults = dict(
     font="sans",
-    fontsize=12,
+    fontsize=13,
     padding=3,
 )
 extension_defaults = widget_defaults.copy()
+
+def monitor_external_brigthness():
+    output = subprocess.run(
+        'xrandr | grep "HDMI-1 connected" | wc -l',
+        shell=True,
+        capture_output=True,
+        text=True
+    ).stdout.strip()
+    if output == "1":
+        return widget.GenPollCommand(
+            cmd='ddcutil getvcp 10 | grep -oE "current value =\s*[0-9]+" | awk "{print \$4}"',
+            fmt="🔆2: {}%",
+            update_interval=2, 
+            shell=True,
+            mouse_callbacks={
+                "Button4": lazy.spawn("ddcutil setvcp 10 + 5"), 
+                "Button5": lazy.spawn("ddcutil setvcp 10 - 5"),
+            },
+        )
+    return widget.TextBox("")
 
 # logo = os.path.join(os.path.dirname(libqtile.resources.__file__), "logo.png")
 logo = "~/Pictures/Wallpapers/432724.jpg"
@@ -232,6 +231,7 @@ screens = [
                     },
                     name_transform=lambda name: name.upper(),
                 ),
+                widget.Sep(padding=10),
                 # NB Systray is incompatible with Wayland, consider using StatusNotifier instead
                 # widget.StatusNotifier(),
                 widget.Systray(),
@@ -267,9 +267,18 @@ screens = [
                 widget.TextBox("🔉:"),
                 # Need to alsa-utils
                 widget.PulseVolume(mouse_callbacks={ "Button1": lazy.spawn("pavucontrol") }),
-                mic_widget,
+                widget.GenPollText(
+                    func=get_mic_volume,
+                    update_interval=1,
+                    fmt='🎤: {}',
+                    mouse_callbacks={
+                        'Button1': lazy.spawn("pactl set-source-mute @DEFAULT_SOURCE@ toggle"),
+                        'Button4': lazy.spawn("pactl set-source-volume @DEFAULT_SOURCE@ +5%"),
+                        'Button5': lazy.spawn("pactl set-source-volume @DEFAULT_SOURCE@ -5%")
+                    }
+                ),
                 widget.Sep(padding=10),
-                widget.TextBox("🔋"),
+                widget.TextBox("⚡"),
                 widget.Battery(format="{char} {percent:2.0%}", update_interval=5),
                 widget.Sep(padding=10),
                 widget.Backlight(
@@ -277,29 +286,20 @@ screens = [
                     backlight_name="intel_backlight",
                     step=5,
                     mouse_callbacks={
-                        "Button4": lazy.spawn("brightnessctl set +5%"),   # Rolagem para cima (aumenta)
-                        "Button5": lazy.spawn("brightnessctl set 5%-"),   # Rolagem para baixo (diminui)
+                        "Button4": lazy.spawn("brightnessctl set +5%"), 
+                        "Button5": lazy.spawn("brightnessctl set 5%-"),
                     },
                 ),
-                widget.GenPollCommand(
-                    cmd='ddcutil getvcp 10 | grep -oE "current value =\s*[0-9]+" | awk "{print \$4}"',
-                    fmt="🔆2: {}%",
-                    update_interval=2, 
-                    shell=True,
-                    mouse_callbacks={
-                        "Button4": lazy.spawn("ddcutil setvcp 10 + 5"),   # Rolagem para cima (aumenta)
-                        "Button5": lazy.spawn("ddcutil setvcp 10 - 5"),   # Rolagem para baixo (diminui)
-                    },
-                ),
+                monitor_external_brigthness(),
                 widget.Sep(padding=10),
                 widget.Clock(
                     format="%d/%m/%Y %a %H:%M:%S",
                     mouse_callbacks={
-                        "Button1": lazy.spawn("korganizer"),   # Rolagem para cima (aumenta)
+                        "Button1": lazy.spawn("korganizer"), 
                     }
                 ),
                 widget.Sep(padding=10),
-                widget.QuickExit(countdown_start=10, default_text="vitor")
+                widget.QuickExit(countdown_start=10, default_text="🚪🏃")
             ],
             24,
             # border_width=[2, 0, 2, 0],  # Draw top and bottom borders
