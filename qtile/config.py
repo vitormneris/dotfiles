@@ -110,7 +110,7 @@ keys = [
         lazy.window.toggle_fullscreen(),
         desc="Toggle fullscreen on the focused window",
     ),
-    Key(["mod1"], "t", lazy.window.toggle_floating(), desc="Toggle floating on the focused window"),
+    Key(["mod1"], "f", lazy.window.toggle_floating(), desc="Toggle floating on the focused window"),
     Key([mod, "control"], "r", lazy.reload_config(), desc="Reload the config"),
     Key([mod, "control"], "q", lazy.shutdown(), desc="Shutdown Qtile"),
     Key([mod], "space", lazy.spawn("rofi -show drun"), desc="Spawn a command using a prompt widget"),
@@ -140,20 +140,14 @@ for vt in range(1, 8):
     )
 
 
-groups = [Group(i) for i in "1234567890"]
+groups = [Group(i) for i in ["dev", "learn", "fun", "any"]]
 
 # mapeamento: grupo "1" → teclas "1" e "KP_1"
 keymap = {
-    "1": ["1", "KP_End"],
-    "2": ["2", "KP_Down"],
-    "3": ["3", "KP_Next"],
-    "4": ["4", "KP_Left"],
-    "5": ["5", "KP_Begin"],
-    "6": ["6", "KP_Right"],
-    "7": ["7", "KP_Home"],
-    "8": ["8", "KP_Up"],
-    "9": ["9", "KP_Prior"],
-    "0": ["0", "KP_Insert"],
+    "dev": ["KP_Insert"],
+    "learn": ["KP_End"],
+    "fun": ["KP_Down"],
+    "any": ["KP_Next"]
 }
 
 for g in groups:
