@@ -12,8 +12,7 @@ def autostart():
     subprocess.run([home + '/dotfiles/scripts/monitor_xrandr_config.sh'])
     subprocess.Popen(["picom", "--backend", "glx"])
     subprocess.Popen(["dunst"])
-    subprocess.Popen(["jesusphrases"])
-
+    
 def get_mic_volume():
     try:
         output = subprocess.run(
@@ -66,6 +65,9 @@ keys = [
 
     Key(["mod1", "shift"], "Left", lazy.function(window_to_previous_group), desc="Move janela para o grupo anterior"),
     Key(["mod1", "shift"], "Right", lazy.function(window_to_next_group), desc="Move janela para o próximo grupo"),
+    
+    Key(["mod1", "shift"], "Up", lazy.layout.move_up(), desc="Move a janela para cima no TreeTab/Max layout"),
+    Key(["mod1", "shift"], "Down", lazy.layout.move_down(), desc="Move janela para baixo no TreeTab/Max layout"),
 
     # Move windows between left/right columns or move up/down in current stack.
     # Moving out of range in Columns layout will create new column.
@@ -117,6 +119,11 @@ keys = [
 
     Key([], "XF86AudioRaiseVolume", lazy.spawn("wpctl set-volume -l 1.0 @DEFAULT_AUDIO_SINK@ 5%+"), desc="Volume up"),
     Key([], "XF86AudioLowerVolume", lazy.spawn("wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"), desc="Volume down"),
+    Key([], "XF86AudioMute", lazy.spawn("wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle")),
+    Key([], "XF86AudioMicMute", lazy.spawn("wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle")),
+
+    Key([], "XF86MonBrightnessUp", lazy.spawn("brightnessctl set +5%")),
+    Key([], "XF86MonBrightnessDown", lazy.spawn("brightnessctl set 5%-")),
 ]
 
 # Add key bindings to switch VTs in Wayland.
@@ -176,16 +183,18 @@ mrg=2
 layouts = [
     layout.Columns(border_focus_stack=[color1, color2], border_width=bw, margin=mrg, border_on_single=True),
     #layout.Max(border_focus_stack=[color1, color2], border_width=bw, margin=mrg),
-    layout.Stack(num_stacks=1, border_focus_stack=[color1, color2], border_width=bw, margin=mrg),
-    layout.Bsp(border_focus_stack=[color1, color2], border_width=bw, margin=mrg, border_on_single=True),
+    #layout.Stack(num_stacks=1, border_focus_stack=[color1, color2], border_width=bw, margin=mrg),
+    #layout.Bsp(border_focus_stack=[color1, color2], border_width=bw, margin=mrg, border_on_single=True),
     #layout.Matrix(border_focus_stack=[color1, color2], border_width=bw, margin=mrg),
-    layout.MonadTall(border_focus_stack=[color1, color2], border_width=bw, margin=mrg),
+    #layout.MonadTall(border_focus_stack=[color1, color2], border_width=bw, margin=mrg),
     #layout.MonadWide(border_focus_stack=[color1, color2], border_width=bw, margin=mrg),
     #layout.RatioTile(border_focus_stack=[color1, color2], border_width=bw, margin=mrg),
-    layout.Tile(border_focus_stack=[color1, color2], border_width=bw, margin=mrg),
+    #layout.Tile(border_focus_stack=[color1, color2], border_width=bw, margin=mrg),
     layout.TreeTab(border_focus_stack=[color1, color2], border_width=bw, margin=mrg),
     #layout.VerticalTile(border_focus_stack=[color1, color2], border_width=bw, margin=mrg),
     #layout.Zoomy(border_focus_stack=[color1, color2], border_width=bw, margin=mrg),
+    #layout.Floating(border_focus_stack=[color1, color2], border_width=bw, margin=mrg),
+    #layout.MonadThreeCol(border_focus_stack=[color1, color2], border_width=bw, margin=mrg)
 ]
 
 widget_defaults = dict(
@@ -221,7 +230,7 @@ screens = [
     Screen(
         top=bar.Bar(
             [
-                widget.CurrentLayout(),
+                widget.CurrentLayout(mode='icon'),
                 widget.GroupBox(),
                 widget.Prompt(),
                 widget.WindowName(),
