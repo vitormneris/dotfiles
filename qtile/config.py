@@ -239,13 +239,13 @@ screens = [
                 # widget.StatusNotifier(),
                 widget.Systray(),
                 widget.GenPollCommand(
-                    cmd='curl -s wttr.in/Sao_Paulo?format=%C+%c+%t',
+                    cmd='curl -s wttr.in/Aruja?format=%C+%c+%t',
                     shell=True,
                     update_interval=60,
                     fmt="{}"
                 ),              
                 widget.Sep(padding=10),
-                widget.Memory(fmt='RAM {}', measure_mem='G'),
+                widget.Memory(fmt='RAM {}', measure_mem='G', format='{MemUsed: .2f}{mm}/{MemTotal: .1f}{mm}'),
                 widget.CPU(),
                 widget.Sep(padding=10),
                 widget.GenPollCommand(
